@@ -9,7 +9,7 @@ public class MainManager : MonoBehaviour
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
-
+    public Text BestScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -18,10 +18,19 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    string playerName;
+    string bestPlayerName;
+    int bestScore;
+
     // Start is called before the first frame update
     void Start()
     {
+        GameManager.Instance.LoadScore ();
+        playerName = GameManager.Instance.playerName;
+        bestPlayerName = GameManager.Instance.bestPlayerName;
+        bestScore = GameManager.Instance.bestScore;
+        BestScoreText.text = "Best Score : " + bestPlayerName + " : " + bestScore;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -66,10 +75,18 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        GameManager.Instance.points = m_Points;
     }
 
     public void GameOver()
     {
+        if (m_Points > bestScore) {
+            GameManager.Instance.bestPlayerName = playerName;
+            GameManager.Instance.bestScore = m_Points;
+            GameManager.Instance.SaveScore ();
+            BestScoreText.text = "Best Score : " + playerName + " : " + m_Points;
+        }
+
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
